@@ -117,8 +117,11 @@ def return_synthetic_sdss_gri_img(filename,
 
         n_iter+=1
 
-
-        b_image, rp, the_used_seed,this_fail_flag    = sunpy__synthetic_image.build_synthetic_image(filename, 'g_SDSS.res', 
+        # The calls to build_synthetic_image had to be updated to account for changes in the number
+        # of return values (previously 4, now 6).  We don't need the other 2 values here, but we
+        # have to catch them so the code won't complain about too many return values to unpack.
+        b_image, rp, the_used_seed,this_fail_flag, _, _    = \
+            sunpy__synthetic_image.build_synthetic_image(filename, 'g_SDSS.res', 
 				seed=seed,
 				r_petro_kpc=r_petro_kpc, 
 				fix_seed=False,
@@ -126,7 +129,8 @@ def return_synthetic_sdss_gri_img(filename,
         if(this_fail_flag):
 	  fail_flag=True
 
-        g_image, dummy, the_used_seed,this_fail_flag = sunpy__synthetic_image.build_synthetic_image(filename, 'r_SDSS.res', 
+        g_image, dummy, the_used_seed,this_fail_flag, _, _ = \
+            sunpy__synthetic_image.build_synthetic_image(filename, 'r_SDSS.res', 
 				seed=the_used_seed,
 				r_petro_kpc=rp,
 				fix_seed=True, 
@@ -134,7 +138,8 @@ def return_synthetic_sdss_gri_img(filename,
         if(this_fail_flag):
           fail_flag=True
 
-        r_image, dummy, the_used_seed, this_fail_flag = sunpy__synthetic_image.build_synthetic_image(filename, 'i_SDSS.res', 
+        r_image, dummy, the_used_seed, this_fail_flag, _, _ = \
+            sunpy__synthetic_image.build_synthetic_image(filename, 'i_SDSS.res', 
                                 seed=the_used_seed,
 				r_petro_kpc=rp,
 				fix_seed=True, 
