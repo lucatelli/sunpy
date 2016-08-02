@@ -53,12 +53,24 @@ def load_broadband_image(filename,band=0, **kwargs):
       The band can be specified as a number or a string (must match the "band_names")		"""
 
   band_images = load_all_broadband_images(filename, **kwargs)
+  # This code change is needed because currently load_all_broadband_images seems to have been
+  # changed to return a tuple, but the code later in this routine assumes that it just returns an
+  # array.  So check for this and get the array if a tuple was returned.
+  if isinstance(band_images, tuple):
+      if isinstance(band_images[0], np.ndarray):
+          band_images = band_images[0]
   band_names  = load_broadband_names(filename)
 
   if type(band) is int:
     return_image = band_images[band,:,:]
   else:
-    band = (((band_names == band).nonzero())[0])[0]
+    # The original version of this code fails for some NumPy versions.  New version will work for
+    # more systems (compatible with original version but also uses syntax that will work for other
+    # NumPy versions if an error is encountered.
+    try:
+      band = (((band_names == band).nonzero())[0])[0]
+    except AttributeError:
+      band = (((np.array(band_names) == band).astype(int).nonzero())[0])[0]
     return_image = band_images[band,:,:]
 
   return return_image
@@ -160,7 +172,13 @@ def load_broadband_effective_wavelengths(filename,band=None):
       name_array = name_array[band]
     else:
       band_names  = load_broadband_names(filename)
-      band_index = (((band_names == band).nonzero())[0])[0]
+      # The original version of this code fails for some NumPy versions.  New version will work for
+      # more systems (compatible with original version but also uses syntax that will work for other
+      # NumPy versions if an error is encountered.
+      try:
+        band_index = (((band_names == band).nonzero())[0])[0]
+      except AttributeError:
+        band_index = (((np.array(band_names) == band).astype(int).nonzero())[0])[0]
       name_array = name_array[band_index]
 
   band=None
@@ -191,13 +209,25 @@ def load_all_broadband_images(filename,camera=0,openlist=None):
 
 def load_broadband_image(filename,band=0,camera=0):
   band_images = load_all_broadband_images(filename,camera=camera)
+  # This code change is needed because currently load_all_broadband_images seems to have been
+  # changed to return a tuple, but the code later in this routine assumes that it just returns an
+  # array.  So check for this and get the array if a tuple was returned.
+  if isinstance(band_images, tuple):
+      if isinstance(band_images[0], np.ndarray):
+          band_images = band_images[0]
   band_names  = load_broadband_names(filename)
  
   if type(band) is int:
     return_image = band_images[band,:,:]
   else:
-    band = (((band_names == band).nonzero())[0])[0]
-    return_image = band_images[band,:,:]
+    # The original version of this code fails for some NumPy versions.  New version will work for
+    # more systems (compatible with original version but also uses syntax that will work for other
+    # NumPy versions if an error is encountered.
+    try:
+      band_index = (((band_names == band).nonzero())[0])[0]
+    except AttributeError:
+      band_index = (((np.array(band_names) == band).astype(int).nonzero())[0])[0]
+    return_image = band_images[int(band_index),:,:]
 
   return return_image
 
