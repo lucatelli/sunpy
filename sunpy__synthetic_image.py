@@ -476,6 +476,8 @@ class synthetic_image:
             #=== load *full* bg image, and its properties ===#
                 bg_filename = (backgrounds[self.band])[0]
                 if not (os.path.isfile(bg_filename)):
+                    ## Note from RM: If I try to wget the files from the URLs given below, I get
+                    ## "Not Found" errors.  So I think these are wrong and should be updated.
                     print "  Background files were not found...  "
                     print "  The standard files used in Torrey al. (2015), Snyder et al., (2015) and Genel et al., (2014) ..."
                     print "  can be downloaded using the download_backgrounds routine or manually from:  "
