@@ -10,6 +10,9 @@
 
 import numpy as np
 import os
+# The two lines below make it possible for people to sit in the examples directory and run the scripts.
+import sys
+sys.path.append('../..')
 import sunpy.sunpy__load as sunpy__load		# 
 import sunpy.sunpy__plot as sunpy__plot
 
@@ -18,14 +21,28 @@ my_api = "enter your own api key here !!!"
 dl_base='http://www.illustris-project.org'
 
 try:
-    catalog = np.loadtxt('directory_catalog_135.txt',
-		    dtype={'names'  : ('subdirs', 'galaxy_numbers', 'galaxy_masses'),
-                           'formats': ('S3', 'i10', 'f8')})
-except:  
+    # Depending on the NumPy version, the line below can raise a TypeError even if the file is
+    # present.  The try/except block enables us to try loadtxt calls that work for more NumPy
+    # versions.
+    try: 
+        catalog = np.loadtxt('directory_catalog_135.txt',
+                             dtype={'names'  : ('subdirs', 'galaxy_numbers', 'galaxy_masses'),
+                                    'formats': ('S3', 'i10', 'f8')})
+    except TypeError:
+        catalog = np.loadtxt('directory_catalog_135.txt',
+                             dtype={'names'  : ('subdirs', 'galaxy_numbers', 'galaxy_masses'),
+                                    'formats': ('S3', 'i8', 'f8')})
+except IOError:  
+    # If we don't already have the file, we have to download it and try again.
     os.system("wget "+dl_base+"/files/directory_catalog_135.txt")
-    catalog = np.loadtxt('directory_catalog_135.txt',
-		    dtype={'names'  : ('subdirs', 'galaxy_numbers', 'galaxy_masses'),
-	                   'formats': ('S3', 'i10','f8')})
+    try:
+        catalog = np.loadtxt('directory_catalog_135.txt',
+                             dtype={'names'  : ('subdirs', 'galaxy_numbers', 'galaxy_masses'),
+                                    'formats': ('S3', 'i10','f8')})
+    except TypeError:
+        catalog = np.loadtxt('directory_catalog_135.txt',
+                             dtype={'names'  : ('subdirs', 'galaxy_numbers', 'galaxy_masses'),
+                                    'formats': ('S3', 'i8','f8')})
 
 
 all_subdirs = catalog['subdirs']
